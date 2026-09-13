@@ -15,9 +15,9 @@ function LoginPage() {
 
 			<LoginForm />
 
-			<p className="mt-6 text-sm text-neutral-500">
+			<p className="mt-6 text-sm text-(--sea-ink)">
 				Don't have an account?{" "}
-				<Link to="/register" className="underline hover:text-neutral-900">
+				<Link to="/register" className="underline hover:text-(--sea-ink-soft)">
 					Create one
 				</Link>
 			</p>

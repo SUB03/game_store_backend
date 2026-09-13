@@ -8,15 +8,15 @@ export const Route = createFileRoute("/register")({
 function RegisterPage() {
 	return (
 		<div className="mx-auto flex min-h-[60vh] max-w-sm flex-col justify-center px-4 py-12">
-			<h1 className="mb-6 text-2xl font-semibold tracking-tight">
-				Create account
+			<h1 className="mb-6 text-2xl text-(sea-ink) tracking-tight">
+				CREATE YOUR ACCOUNT
 			</h1>
 
 			<RegisterForm />
 
-			<p className="mt-6 text-sm text-neutral-500">
+			<p className="mt-6 text-sm text-(--sea-ink)">
 				Already have an account?{" "}
-				<Link to="/login" className="underline hover:text-neutral-900">
+				<Link to="/login" className="underline hover:text-(--sea-ink-soft)">
 					Sign in
 				</Link>
 			</p>
