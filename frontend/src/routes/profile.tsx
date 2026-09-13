@@ -1,19 +1,19 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect } from "@tanstack/react-router"
 
-export const Route = createFileRoute('/profile')({
-  beforeLoad: async ({context}) => {    
-    if (!context.user) {
-      throw redirect({
-        to: "/login"
-      })
-    }
-    return {user: context.user}
-  },
-  component: RouteComponent,
+export const Route = createFileRoute("/profile")({
+	beforeLoad: async ({ context }) => {
+		if (!context.user) {
+			throw redirect({
+				to: "/login",
+			})
+		}
+		return { user: context.user }
+	},
+	component: RouteComponent,
 })
 
 function RouteComponent() {
-  const context = Route.useRouteContext()
+	const context = Route.useRouteContext()
 
-  return <div>Hello {context.user.username}!</div>
+	return <div>Hello {context.user.username}!</div>
 }
