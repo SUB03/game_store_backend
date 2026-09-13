@@ -7,7 +7,7 @@ import Header from '../components/Header'
 
 import appCss from '../styles.css?url'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
-import { getUsersMe } from '#/utils/api'
+import { getUsersMe } from '#/server_functions/getUsersMe'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -16,7 +16,6 @@ interface MyRouterContext {
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   beforeLoad: async () => {
     const user = await getUsersMe()
-    console.log(user)
 
     return {user}
   },
@@ -49,7 +48,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
+      <body className="font-sans antialiased wrap-anywhere selection:bg-[rgba(79,184,178,0.24)]">
           <Header />
           {children}
           <Footer />

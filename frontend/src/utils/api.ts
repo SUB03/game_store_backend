@@ -1,9 +1,8 @@
-import type { User } from '#/types'
-import { createMiddleware, createServerFn } from '@tanstack/react-start'
+import { createMiddleware } from '@tanstack/react-start'
 import { getCookie, setResponseHeader} from '@tanstack/react-start/server'
-import axios from 'axios'
+import axios from 'redaxios'
 
-const AUTH_API = "http://localhost:8000"
+export const AUTH_API = "http://localhost:8000"
 
 export const api = axios.create({
   baseURL: AUTH_API,
@@ -66,16 +65,3 @@ export const authMiddleware = createMiddleware({type: "function"})
       }
     })
   })
-
-export const getUsersMe = createServerFn()
-  .middleware([authMiddleware])
-  .handler(
-    async ({context}): Promise<User | null> => {
-      const response = await context.api(AUTH_API + "/users/me")
-
-      if (!response.ok) {
-        return null
-      }
-      return response.json()
-    }
-  )
