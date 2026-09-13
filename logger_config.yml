@@ -2,7 +2,7 @@ version: 1
 disable_existing_loggers: false
 formatters:
   simple:
-    format: '%(level_name)s: %(message)s'
+    format: '%(levelname)s: %(message)s'
   detailed:
     format: '[%(levelname)s|%(module)s|L%(lineno)d] %(acttime)s: %(message)s'
     datefmt: '%Y-%m-%dT%H:%M:%S%z'

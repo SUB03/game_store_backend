@@ -66,23 +66,16 @@ def create_tokens(username: str, jti: str):
     logger.info("created tokens", extra={"username": username})
     return access_token, refresh_token, refresh_expire
 
-async def get_user_from_jwt(token: Annotated[str, Depends(oauth2_scheme)],
-            csrf: Annotated[str | None, Header(alias="CSRF")] = None) -> UserDB:
+async def get_user_from_jwt(token: Annotated[str, Depends(oauth2_scheme)]) -> UserDB:
     credentials_exeption = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    if not csrf:
-        logger.warning("missing csrf header")
-        raise credentials_exeption
     payload = Token(**decode_jwt(token, SECRET_KEY, ALGORITHM))
     username = payload.sub
     if not username:
         logger.warning("missing sub claim in token")
-        raise credentials_exeption
-    if str(payload.jti) != csrf:
-        logger.warning("missmatched token's uid and csrf uid")
         raise credentials_exeption
     # checks if this user in whitelist and allowed to auth
     db_token = await get_token_from_db(payload.jti)

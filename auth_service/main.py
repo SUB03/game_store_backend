@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 from fastapi import FastAPI, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
 
 import time
 import yaml, atexit
@@ -46,6 +47,19 @@ logger = logging.getLogger("auth_service")
 
 api = FastAPI(title="my app", lifespan=lifespan)
 api.include_router(users.router)
+
+origins = [
+    "http://localhost",
+    "http://localhost:3001",
+]
+
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @api.middleware("http")
 async def metrics_middleware(request: Request, call_next: Callable[[Request], Awaitable[Response]]):

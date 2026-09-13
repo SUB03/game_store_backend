@@ -1,4 +1,5 @@
 from datetime import timezone, timedelta, datetime
+import os
 from typing import Annotated
 import logging
 import uuid
@@ -16,6 +17,7 @@ from auth_service.utils.hash_password import (
     SECRET_KEY,
     ALGORITHM
 )
+from auth_service.utils.set_cookies import _set_cookies
 from .users_utils import (
     ACCESS_TOKEN_EXPIRE_MINUTES,
     REFRESH_TOKEN_EXPIRE_MINUTES,
@@ -28,6 +30,7 @@ from .users_utils import (
     delete_token_from_db,
 )
 
+DEVELOPMENT = os.environ["DEVELOPMENT"]
 logger = logging.getLogger("auth_service")
 
 router = APIRouter(
@@ -35,8 +38,17 @@ router = APIRouter(
     tags=["users"]
 )
 
+# protect mutations with 
+# csrf: Annotated[str | None, Header(alias="CSRF")] = None
+#     if not csrf:
+#       logger.warning("missing csrf header")
+#       raise credentials_exeption
+#    if str(payload.jti) != csrf:
+#        logger.warning("missmatched token's uid and csrf uid")
+#        raise credentials_exeption
+
 @router.get("/me", response_model=UserBase)
-async def get_users_me(user: Annotated[UserDB, Depends(get_user_from_jwt)]):
+async def get_users_me(user: Annotated[UserBase, Depends(get_user_from_jwt)]):
     logger.info("requested user info", extra={"username": user.username})
     return user
 
@@ -51,21 +63,8 @@ async def login(response: Response, form_data: Annotated[OAuth2PasswordRequestFo
     access_token, refresh_token, refresh_expire = create_tokens(user.username, str(jti))
     await store_token_in_db(jti, refresh_expire)
 
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=True,
-        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-    )
-
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        secure=True,
-        max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
-    )
+    _set_cookies(response, access_token, refresh_token, False if DEVELOPMENT else True,
+        ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES)
 
     return {"message": "authorized", "CSRF": str(jti)}
 
@@ -83,10 +82,9 @@ async def logout(response: Response, refresh_token: Annotated[str | None, Cookie
 @router.post("/refresh")
 async def refresh(
         response: Response,
-        csrf: Annotated[str | None, Header(alias="CSRF")] = None,
         refresh_token: Annotated[str | None, Cookie()] = None
     ):
-    if not refresh_token or not csrf:
+    if not refresh_token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="could not validate credentials",
@@ -94,33 +92,14 @@ async def refresh(
         )
 
     payload = Token(**decode_jwt(refresh_token, SECRET_KEY, ALGORITHM))
-    if str(payload.jti) != csrf:
-        raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="could not validate credentials",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
     await delete_token_from_db(payload.jti)
 
     jti = uuid.uuid4()
     access_token, refresh_token, refresh_expire = create_tokens(payload.sub, str(jti))
     await store_token_in_db(jti, refresh_expire)
 
-    response.set_cookie(
-            key="access_token",
-            value=access_token,
-            httponly=True,
-            secure=True,
-            max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        )
-    
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        secure=True,
-        max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
-    )
+    _set_cookies(response, access_token, refresh_token, False if DEVELOPMENT else True,
+        ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES)
 
     return {"message": "authorized", "CSRF": str(jti)}
 
@@ -137,21 +116,8 @@ async def registrate(response: Response, user_data: CreateUser):
     access_token, refresh_token, refresh_expire = create_tokens(user_data.username, str(jti))
     await store_token_in_db(jti, refresh_expire)
 
-    response.set_cookie(
-        key="access_token",
-        value=access_token,
-        httponly=True,
-        secure=True,
-        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-    )
-
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_token,
-        httponly=True,
-        secure=True,
-        max_age=REFRESH_TOKEN_EXPIRE_MINUTES * 60,
-    )
+    _set_cookies(response, access_token, refresh_token, False if DEVELOPMENT else True,
+        ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES)
 
     return {"message": "authorized", "CSRF": str(jti)}
 
