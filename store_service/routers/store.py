@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import HTTPException, routing, Depends, status, Request, Cookie
+from fastapi import HTTPException, routing, Depends, status, Request, Cookie, Query
 
 from store_service.schemas.games import Price
 from store_service.engine import engine
@@ -16,13 +16,12 @@ router = routing.APIRouter(
 )
 
 @router.get("/games")
-async def get_games(page: int = 1, per_page: int = 10):
+async def get_games(offset: int = Query(0, ge=0)):
+    limit = 12
     #TODO: add search filters
-    if page < 1 or per_page < 1:
-        raise HTTPException(status_code=400, detail="page and per_page must be >= 1")
     
     async with engine.begin() as conn:
-        result = await conn.execute(games.select().order_by(games.c.recommendations.desc()).limit(per_page).offset((page - 1) * per_page))
+        result = await conn.execute(games.select().order_by(games.c.recommendations.desc()).limit(limit).offset((offset) * limit))
         result = result.mappings().all()
     return result
 

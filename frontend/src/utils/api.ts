@@ -3,9 +3,18 @@ import { getCookie, setResponseHeader } from "@tanstack/react-start/server"
 import axios from "redaxios"
 
 export const AUTH_API = "http://localhost:8000"
+export const STORE_API = "http://localhost:8001"
 
-export const api = axios.create({
+export const auth_api = axios.create({
 	baseURL: AUTH_API,
+	withCredentials: true,
+	headers: {
+		"Content-Type": "application/json",
+	},
+})
+
+export const store_api = axios.create({
+	baseURL: STORE_API,
 	withCredentials: true,
 	headers: {
 		"Content-Type": "application/json",

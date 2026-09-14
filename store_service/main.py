@@ -21,13 +21,14 @@ REQUEST_LATENCY = Histogram(
 api = FastAPI()
 api.include_router(store.router)
 
-# origins = [
-#     "localhost:"
-# ]
+origins = [
+    "http://localhost",
+    "http://localhost:3001",
+]
 
 api.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
