@@ -91,11 +91,26 @@ body,
   min-height: 100%;
 }
 
+@utility glass-panel {
+  background: radial-gradient(
+    ellipse at top left,
+    rgba(66, 69, 76, 0.6),
+    rgba(37, 40, 46, 0.4)
+  );
+  backdrop-filter: blur(15px);
+  transition: color, background-color, border-color;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
+}
+.glass-panel:hover {
+  background: radial-gradient(ellipse at top left, rgba(96,99,106,.75), rgba(57,60,66,.55));
+}
+
 .header-nav-e {
-  @apply inline-flex items-center gap-2;
-  @apply px-3 py-1.5 text-base text-[var(--sea-ink-soft)] no-underline;
+  @apply inline-flex items-center;
+  @apply px-2 py-1.5 text-base text-[var(--sea-ink-soft)] no-underline;
   /* @apply shadow-[0_8px_24px_rgba(30,90,72,0.08)] */
-  @apply sm:px-4 sm:py-2;
+  @apply sm:px-2 sm:py-2;
 }
 .header-nav-e:hover {
   @apply text-[var(--sea-ink)]

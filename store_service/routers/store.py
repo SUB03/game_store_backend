@@ -1,10 +1,11 @@
 from typing import Annotated
 
 from fastapi import HTTPException, routing, Depends, status, Request, Cookie, Query
+from sqlalchemy import select, func
 
 from store_service.schemas.games import Price
 from store_service.engine import engine
-from store_service.models.models import games
+from store_service.models.models import games, tags
 from store_service.routers.store_utils import get_price, has_game, make_payment, add_game
 from store_service.schemas.games import PurchaseGame
 from store_service.utils.jwt import decode_jwt
@@ -18,10 +19,15 @@ router = routing.APIRouter(
 @router.get("/games")
 async def get_games(offset: int = Query(0, ge=0)):
     limit = 12
-    #TODO: add search filters
+    #TODO: add search filters and limit + 1 trick with returning is_next_page
     
     async with engine.begin() as conn:
-        result = await conn.execute(games.select().order_by(games.c.recommendations.desc()).limit(limit).offset((offset) * limit))
+        result = await conn.execute(
+            select(games, func.array_agg(tags.c.tags).label("tags"))
+            .join(tags, tags.c.appid == games.c.appid, isouter=True)
+            .group_by(games.c.appid)
+            .order_by(games.c.recommendations.desc())
+            .limit(limit).offset((offset) * limit))
         result = result.mappings().all()
     return result
 

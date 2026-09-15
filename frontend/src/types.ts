@@ -26,4 +26,5 @@ export interface Game {
 	recommendations: number
 	positive: number
 	negative: number
+	tags: string[]
 }
