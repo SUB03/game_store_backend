@@ -16,7 +16,7 @@ export default function Header() {
 							alt="store icon"
 							width={64}
 							height={64}
-							className="invert-75"
+							className="invert-(--logo-invert)"
 						/>
 					</a>
 					<div className="flex">

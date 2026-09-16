@@ -29,6 +29,10 @@
   --hero-b: rgba(47, 106, 74, 0.2);
   --search-bg: rgb(231, 227, 227);
   --search-bg-hover: rgb(184, 180, 180);
+  --price-bg: rgba(31, 39, 43, 0.8);
+  --price-discount-bg: #4c6b22;
+  --price: #beee11;
+  --logo-invert: 0.25
 }
 
 :root[data-theme="dark"] {
@@ -53,6 +57,9 @@
   --hero-b: rgba(110, 200, 154, 0.12);
   --search-bg: rgb(45, 44, 44);
   --search-bg-hover: rgb(65, 63, 63);
+  --price-discount-bg: #4c6b22;
+  --price: #beee11;
+  --logo-invert: 0.75
 }
 
 @media (prefers-color-scheme: dark) {
@@ -78,6 +85,9 @@
     --hero-b: rgba(110, 200, 154, 0.12);
     --search-bg: rgb(45, 44, 44);
     --search-bg-hover: rgb(65, 63, 63);
+    --price-discount-bg: #4c6b22;
+    --price: #beee11;
+    --logo-invert: 0.75
   }
 }
 
@@ -113,5 +123,5 @@ body,
   @apply sm:px-2 sm:py-2;
 }
 .header-nav-e:hover {
-  @apply text-[var(--sea-ink)]
+  @apply text-(--sea-ink)
 }

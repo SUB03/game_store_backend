@@ -23,6 +23,8 @@
     "@tanstack/react-router-devtools": "latest",
     "@tanstack/react-router-ssr-query": "^1.167.2",
     "@tanstack/react-start": "latest",
+    "@types/big.js": "^7.0.0",
+    "big.js": "^7.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "redaxios": "^0.5.1",

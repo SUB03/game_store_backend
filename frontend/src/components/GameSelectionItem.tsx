@@ -30,7 +30,7 @@ export default function GameSelectionItem({ game }: { game: Game }) {
 				<a href="/" className="shrink-0 m-1">
 					<img
 						src={game.header_image}
-						alt="Game header"
+						alt={game.name}
 						className="h-full w-auto object-fill"
 					/>
 				</a>

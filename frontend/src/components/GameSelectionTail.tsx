@@ -8,21 +8,22 @@ import GameSelectionItemSmall from "./GameSelectionItemSmall"
 export default function GameSelectionTail({ offset }: { offset: number }) {
 	const navigate = useNavigate({ from: Route.fullPath })
 
-	const [startOffset] = useState(offset < 0 ? 0 : offset)
+	const [startOffset] = useState(offset === 0 ? 12 : offset)
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-		useSuspenseInfiniteQuery(gamesInfiniteQueryOptions(startOffset + 12))
+		useSuspenseInfiniteQuery(gamesInfiniteQueryOptions(startOffset))
 
 	useEffect(() => {
+		const currentBatchStart = startOffset + (data.pages.length - 1) * 12
 		navigate({
 			search: (prev) => ({
 				...prev,
-				offset: startOffset + 12,
+				offset: currentBatchStart >= 0 ? currentBatchStart : undefined,
 			}),
 			replace: true,
 			resetScroll: false,
 		})
-	}, [startOffset, navigate])
+	}, [data.pages.length, startOffset, navigate])
 
 	return (
 		<>
