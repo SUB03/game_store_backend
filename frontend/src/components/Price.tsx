@@ -32,15 +32,13 @@ export default function Price({
 					</div>
 				</div>
 			) : (
-				<div className="self-end">
-					<span>
-						{price > 0
-							? formatCurrencyValue({
-									value: price,
-									locale: "us",
-								})
-							: "Free To Play"}
-					</span>
+				<div className="self-end px-2 py-3">
+					{price > 0
+						? formatCurrencyValue({
+								value: price,
+								locale: "us",
+							})
+						: "Free To Play"}
 				</div>
 			)}
 		</>

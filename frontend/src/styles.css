@@ -91,9 +91,9 @@
   }
 }
 
-* {
+/* * {
   box-sizing: border-box;
-}
+} */
 
 html,
 body,
@@ -124,4 +124,11 @@ body,
 }
 .header-nav-e:hover {
   @apply text-(--sea-ink)
+}
+
+@layer components{
+  .game-item {
+    display: grid;
+    
+  }
 }
