@@ -27,9 +27,11 @@ export default function GameSelectionTail({ offset }: { offset: number }) {
 
 	return (
 		<>
-			{data.pages.flat().map((game) => (
-				<GameSelectionItemSmall key={game.appid} game={game} />
-			))}
+			{data.pages
+				.flatMap((page) => page.results)
+				.map((game) => (
+					<GameSelectionItemSmall key={game.appid} game={game} />
+				))}
 
 			{hasNextPage && (
 				<div className="flex justify-center mt-4">

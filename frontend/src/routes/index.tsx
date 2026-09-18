@@ -37,7 +37,7 @@ function App() {
 			{/* game section */}
 			<section className="p-10 max-w-6xl mx-auto bg-linear-0 from-[rgba(44,48,55)] to-[rgba(80,95,110)]">
 				<div className="flex flex-col gap-2">
-					{games.map((game) => (
+					{games.results.map((game) => (
 						<GameSelectionItemSmall key={game.appid} game={game} />
 					))}
 					{started && (
@@ -51,7 +51,7 @@ function App() {
 						<button
 							type="button"
 							onClick={handleLoadMore}
-							disabled={games.length < 12}
+							disabled={!games.is_next_page}
 							className="px-30 py-2 rounded-xs bg-gray-600 hover:bg-gray-500 disabled:opacity-50 text-sm"
 						>
 							Show more
