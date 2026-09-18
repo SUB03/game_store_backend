@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import HTTPException, routing, Depends, status, Request, Cookie, Query
+from fastapi import HTTPException, routing, Depends, status, Request, Cookie, Query, Path
 from sqlalchemy import select, func
 
 from store_service.schemas.games import Price
@@ -15,6 +15,14 @@ router = routing.APIRouter(
     prefix="/store",
     tags=["store"]
 )
+
+@router.get("/games/{appid}")
+async def get_game(appid: Annotated[int, Path(title="appid of the game in db")]):
+    async with engine.begin() as conn:
+        result = await conn.execute(
+            games.select().where(games.c.appid == appid)
+        )
+    return result.mappings().first()
 
 @router.get("/games")
 async def get_games(offset: int = Query(0, ge=0)):

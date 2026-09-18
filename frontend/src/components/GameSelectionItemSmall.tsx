@@ -65,7 +65,7 @@ export default function GameSelectionItem({ game }: { game: Game }) {
 						</span>
 					))}
 				</div>
-				<div className="[grid-area:platform] sm:flex text-xs flex-row text-sm gap-2 hidden">
+				<div className="[grid-area:platform] sm:flex text-xs flex-row gap-2 hidden">
 					<span className="hidden md:block">RELESE DATE:</span>
 					<span className="">
 						{formatDateTime({
