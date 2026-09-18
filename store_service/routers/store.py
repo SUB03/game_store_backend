@@ -25,19 +25,43 @@ async def get_game(appid: Annotated[int, Path(title="appid of the game in db")])
     return result.mappings().first()
 
 @router.get("/games")
-async def get_games(offset: int = Query(0, ge=0)):
+async def get_games(
+    offset: int = Query(0, ge=0),
+    search: str | None = Query(None, description="Search by name"),
+    tags_filter: list[str] | None = Query(None, description="Filter by tags (AND)"),
+):
     limit = 12
-    #TODO: add search filters and limit + 1 trick with returning is_next_page
+
+    stmt = (
+        select(games, func.array_agg(tags.c.tags).label("tags"))
+        .join(tags, tags.c.appid == games.c.appid, isouter=True)
+        .group_by(games.c.appid)
+        .order_by(games.c.recommendations.desc(),  games.c.appid)
+        .limit(limit + 1)  # fetch one extra to detect next page
+        .offset(offset * limit)
+    )
+
+    if search:
+        stmt = stmt.where(games.c.name.ilike(f"%{search}%"))
+
+    if tags_filter:
+        # Only include games that have ALL the requested tags
+        stmt = stmt.having(
+            func.count(func.distinct(tags.c.tags)).filter(
+                tags.c.tags.in_(tags_filter)
+            ) >= len(tags_filter)
+        )
     
     async with engine.begin() as conn:
-        result = await conn.execute(
-            select(games, func.array_agg(tags.c.tags).label("tags"))
-            .join(tags, tags.c.appid == games.c.appid, isouter=True)
-            .group_by(games.c.appid)
-            .order_by(games.c.recommendations.desc())
-            .limit(limit).offset((offset) * limit))
+        result = await conn.execute(stmt)
         result = result.mappings().all()
-    return result
+
+    is_next_page = len(result) > limit
+
+    return {
+        "results": result[:limit],
+        "is_next_page": is_next_page,
+    }
 
 @router.post("/purchase_game")
 async def purchase_game(purchase: PurchaseGame, access_token: Annotated[str | None, Cookie()] = None):
