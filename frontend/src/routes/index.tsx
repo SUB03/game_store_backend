@@ -15,7 +15,9 @@ export const Route = createFileRoute("/")({
 	validateSearch: searchSchema,
 	loader: async ({ context }) => {
 		try {
-			const data = await context.queryClient.query(gamesQueryOptions())
+			const data = await context.queryClient.query(
+				gamesQueryOptions({ offset: 0 }),
+			)
 			return { data }
 		} catch {
 			return { data: null }
@@ -28,7 +30,7 @@ function App() {
 	const { offset = 0 } = Route.useSearch()
 	const [started, setStarted] = useState(false)
 
-	const { data: games } = useSuspenseQuery(gamesQueryOptions())
+	const { data: games } = useSuspenseQuery(gamesQueryOptions({ offset: 0 }))
 
 	const handleLoadMore = () => setStarted(true)
 
