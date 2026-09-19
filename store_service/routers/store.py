@@ -16,6 +16,48 @@ router = routing.APIRouter(
     tags=["store"]
 )
 
+@router.get("/tags")
+async def get_tags(
+    selected_tags: list[str] | None = Query(
+        None, description="Only count games that have ALL these tags"
+    ),
+):
+    async with engine.begin() as conn:
+        if not selected_tags:
+            # No filter: count every tag across all games
+            stmt = (
+                select(
+                    tags.c.tags.label("tag"),
+                    func.count(func.distinct(tags.c.appid)).label("game_count"),
+                )
+                .group_by(tags.c.tags)
+                .order_by(func.count(func.distinct(tags.c.appid)).desc())
+            )
+        else:
+            # Find games that have ALL selected tags, then count tags within that subset
+            matching_games = (
+                select(tags.c.appid)
+                .where(tags.c.tags.in_(selected_tags))
+                .group_by(tags.c.appid)
+                .having(
+                    func.count(func.distinct(tags.c.tags)) >= len(selected_tags)
+                )
+                .subquery()
+            )
+            stmt = (
+                select(
+                    tags.c.tags.label("tag"),
+                    func.count(func.distinct(tags.c.appid)).label("game_count"),
+                )
+                .where(tags.c.appid.in_(select(matching_games.c.appid)))
+                .group_by(tags.c.tags)
+                .order_by(func.count(func.distinct(tags.c.appid)).desc())
+            )
+
+        result = await conn.execute(stmt)
+        rows = result.mappings().all()
+    return rows
+
 @router.get("/games/{appid}")
 async def get_game(appid: Annotated[int, Path(title="appid of the game in db")]):
     async with engine.begin() as conn:
