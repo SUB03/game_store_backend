@@ -15,5 +15,9 @@ export const Route = createFileRoute("/profile")({
 function RouteComponent() {
 	const context = Route.useRouteContext()
 
-	return <div>Hello {context.user.username}!</div>
+	return (
+		<div className="min-h-175">
+			<div>Hello {context.user.username}!</div>
+		</div>
+	)
 }

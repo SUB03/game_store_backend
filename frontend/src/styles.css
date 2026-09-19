@@ -136,3 +136,27 @@ body,
     
   }
 }
+
+@layer footer {
+  .footer-items {
+    display: grid;
+    gap: 64px;
+    grid-template-columns: auto auto;
+    grid-template-areas: "store empty" "legal more" "main main";
+    justify-content: center;
+  }
+
+  @media (width >= 48rem) {
+    .footer-items {
+      grid-template-columns: fit-content fit-content max-content max-content;
+      grid-template-areas: "store empty legal more" "main main . ." ;
+    }
+  }
+
+  @media (width >= 64rem) {
+    .footer-items {
+      grid-template-columns: fit-content(400px) max-content max-content max-content max-content;
+      grid-template-areas: "main store empty legal more" ;
+    }
+  }
+}
