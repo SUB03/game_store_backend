@@ -116,6 +116,10 @@ body,
   background: radial-gradient(ellipse at top left, rgba(96,99,106,.75), rgba(57,60,66,.55));
 }
 
+.blue-button {
+  @apply bg-linear-to-r from-cyan-500 hover:from-cyan-300 to-blue-500
+}
+
 .header-nav-e {
   @apply inline-flex items-center;
   @apply px-2 py-1.5 text-base text-[var(--sea-ink-soft)] no-underline;

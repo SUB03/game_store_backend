@@ -11,7 +11,7 @@ export default function Footer() {
 				</p>
 			</div>
 			<div className="[grid-area:store] flex flex-col">
-				<h3>STORE</h3>
+				<h3 className="text-lg font-bold text-(--sea-ink)">STORE</h3>
 				<a href="/about">About Store</a>
 				<p>Store SSA</p>
 				<p>Storeworks</p>
@@ -19,14 +19,14 @@ export default function Footer() {
 				<p>Gift Cards</p>
 			</div>
 			<div className="[grid-area:empty] flex flex-col">
-				<h3>EMPTY</h3>
+				<h3 className="text-lg font-bold text-(--sea-ink)">EMPTY</h3>
 				<p>About Empty</p>
 				<p>Skills</p>
 				<p>Harware</p>
 				<p>Recycling</p>
 			</div>
 			<div className="flex flex-col">
-				<h3>LEGAL</h3>
+				<h3 className="text-lg font-bold text-(--sea-ink)">LEGAL</h3>
 				<p>Privacy</p>
 				<p>Accessibility</p>
 				<p>Notices & Polices</p>
@@ -34,7 +34,7 @@ export default function Footer() {
 				<p>Refunds</p>
 			</div>
 			<div className="flex flex-col">
-				<h3>MORE</h3>
+				<h3 className="text-lg font-bold text-(--sea-ink)">MORE</h3>
 				<p>Get Store</p>
 				<p>Get Mobile apps</p>
 				<p>Get Support</p>
