@@ -38,11 +38,14 @@ export default function GameSelectionItem({ game }: { game: Game }) {
 				sm:flex-row
 				flex-col
 				glass-panel
-				shadow-lg shadow-gray-800/60
+				shadow_item
 				text-(--sea-ink-soft)
   			"
 		>
-			<a href="/" className="m-1 overflow-hidden grow shrink basis-auto sm:basis-1/2 md:basis-1/4]">
+			<a
+				href="/"
+				className="m-1 overflow-hidden grow shrink basis-auto sm:basis-1/2 md:basis-1/4]"
+			>
 				<img
 					src={game.header_image}
 					alt={game.name}

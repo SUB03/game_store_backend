@@ -10,6 +10,7 @@ from store_service.routers.store_utils import get_price, has_game, make_payment,
 from store_service.schemas.games import PurchaseGame
 from store_service.utils.jwt import decode_jwt
 from store_service.schemas.token import Token
+from store_service.utils.tag_groups import _TAG_TO_GROUP, TAG_GROUPS
 
 router = routing.APIRouter(
     prefix="/store",
@@ -56,7 +57,27 @@ async def get_tags(
 
         result = await conn.execute(stmt)
         rows = result.mappings().all()
-    return rows
+
+    grouped: dict[str, list[dict]] = {}
+    other: list[dict] = []
+
+    for row in rows:
+        group = _TAG_TO_GROUP.get(row["tag"])
+        if group:
+            grouped.setdefault(group, []).append(row)
+        else:
+            other.append(row)
+
+    if other:
+        grouped["Other"] = other
+
+    # Preserve the order of TAG_GROUPS, drop empty groups
+    ordered = {
+        name: grouped[name]
+        for name in [*TAG_GROUPS, "Other"]
+        if name in grouped
+    }
+    return ordered
 
 @router.get("/games/{appid}")
 async def get_game(appid: Annotated[int, Path(title="appid of the game in db")]):

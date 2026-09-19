@@ -126,6 +126,10 @@ body,
   @apply text-(--sea-ink)
 }
 
+.shadow_item {
+  @apply shadow-[0_0_20px_rgba(17,24,39,0.8)] shadow-gray-800
+}
+
 @layer components{
   .game-item {
     display: grid;
