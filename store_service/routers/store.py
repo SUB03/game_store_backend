@@ -106,7 +106,7 @@ async def get_games(
         .group_by(games_table.c.appid)
         .order_by(games_table.c.recommendations.desc(),  games_table.c.appid)
         .limit(limit + 1)  # fetch one extra to detect next page
-        .offset(offset * limit)
+        .offset(offset)
     )
 
     if search:

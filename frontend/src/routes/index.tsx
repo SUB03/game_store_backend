@@ -1,11 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router"
 import { gamesQueryOptions } from "#/queries/games"
-import { useSuspenseQuery } from "@tanstack/react-query"
-import { Suspense, useState } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { z } from "zod"
-import GameSelectionItemSmall from "#/components/GameSelectionItemSmall"
 import GameSelectionTail from "#/components/GameSelectionTail"
 import GameFilters from "#/components/GameFilters"
+import GameSelectionHead from "#/components/GameSelectionHead"
 
 const searchSchema = z.object({
 	offset: z.number().int().min(0).optional(),
@@ -33,11 +32,11 @@ function App() {
 	const { offset = 0, tags: selected_tags = [] } = Route.useSearch()
 	const [started, setStarted] = useState(false)
 
-	const { data: games } = useSuspenseQuery(
-		gamesQueryOptions({ offset: 0, tags: selected_tags }),
-	)
-
 	const handleLoadMore = () => setStarted(true)
+
+	useEffect(() => {
+		setStarted(false)
+	}, [selected_tags])
 
 	return (
 		<main className="page-wrap px-4 pb-8 pt-14">
@@ -47,27 +46,23 @@ function App() {
 				</Suspense>
 				<div className="basis-full">
 					<div className="flex flex-col gap-2">
-						{games.results.map((game) => (
-							<GameSelectionItemSmall key={game.appid} game={game} />
-						))}
+						<Suspense fallback={<div>test head fallback</div>}>
+							<GameSelectionHead
+								tags={selected_tags}
+								started={started}
+								handleLoadMore={handleLoadMore}
+							/>
+						</Suspense>
 						{started && (
 							<Suspense>
-								<GameSelectionTail offset={offset} tags={selected_tags} />
+								<GameSelectionTail
+									key={selected_tags.join(",")}
+									offset={offset}
+									tags={selected_tags}
+								/>
 							</Suspense>
 						)}
 					</div>
-					{!started && (
-						<div className="flex justify-center mt-4">
-							<button
-								type="button"
-								onClick={handleLoadMore}
-								disabled={!games.is_next_page}
-								className="px-30 py-2 rounded-xs bg-gray-600 hover:bg-gray-500 disabled:opacity-50 text-sm"
-							>
-								Show more
-							</button>
-						</div>
-					)}
 				</div>
 			</section>
 		</main>
