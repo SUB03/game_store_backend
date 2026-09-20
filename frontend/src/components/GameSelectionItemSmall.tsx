@@ -43,7 +43,7 @@ export default function GameSelectionItem({ game }: { game: Game }) {
   			"
 		>
 			<a
-				href="/"
+				href={`/app/${game.appid}/${game.name}`}
 				className="m-1 overflow-hidden grow shrink basis-auto sm:basis-1/2 md:basis-1/4]"
 			>
 				<img
@@ -53,7 +53,10 @@ export default function GameSelectionItem({ game }: { game: Game }) {
 				/>
 			</a>
 			<div className="grid grow shrink basis-auto sm:basis-1/2 md:basis-3/4 pl-2 pr-1 py-1 md:grid-rows-[auto_min-content_min-content_auto] grid-rows-[min-content_min-content_min-content_min_content_auto]  md:[grid-template-areas:'title_title'_'tags_tags'_'platform_price'_'reviews_price'] [grid-template-areas:'title_title'_'tags_tags'_'platform_platform'_'reviews_reviews'_'price_price'] overflow-hidden">
-				<a href="/" className="[grid-area:title] hidden md:flex">
+				<a
+					href={`/app/${game.appid}/${game.name}`}
+					className="[grid-area:title] hidden md:flex"
+				>
 					<p className="text-lg self-end font-bold hover:underline">
 						{game.name}
 					</p>
