@@ -2,7 +2,7 @@ import grpc
 from fastapi import HTTPException
 
 from store_service.engine import engine
-from store_service.models import games
+from store_service.models import games_table
 import payment_proto.payment_service_pb2_grpc as ps_pb2_grpc
 import payment_proto.payment_service_pb2 as ps_pb2
 import users_proto.users_service_pb2_grpc as us_pb2_grpc
@@ -74,6 +74,6 @@ async def add_game(username: str, appid: int) -> us_pb2.AddGameToUserResponse:
 
 async def get_price(appid: int):
     async with engine.begin() as conn:
-        result = await conn.execute(games.select().where(games.c.appid==appid))
+        result = await conn.execute(games_table.select().where(games_table.c.appid==appid))
         result = result.fetchone()
     return result

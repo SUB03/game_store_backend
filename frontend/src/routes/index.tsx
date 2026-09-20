@@ -5,19 +5,21 @@ import { Suspense, useState } from "react"
 import { z } from "zod"
 import GameSelectionItemSmall from "#/components/GameSelectionItemSmall"
 import GameSelectionTail from "#/components/GameSelectionTail"
-import { tagsQueryOptions } from "#/queries/tags"
+import GameFilters from "#/components/GameFilters"
 
 const searchSchema = z.object({
 	offset: z.number().int().min(0).optional(),
+	tags: z.array(z.string()).optional(),
 })
 
 export const Route = createFileRoute("/")({
 	shouldReload: false,
 	validateSearch: searchSchema,
-	loader: async ({ context }) => {
+	loaderDeps: ({ search }) => ({ tags: search.tags ?? [] }),
+	loader: async ({ context, deps }) => {
 		try {
 			const data = await context.queryClient.query(
-				gamesQueryOptions({ offset: 0 }),
+				gamesQueryOptions({ offset: 0, tags: deps.tags }),
 			)
 			return { data }
 		} catch {
@@ -28,39 +30,21 @@ export const Route = createFileRoute("/")({
 })
 
 function App() {
-	const { offset = 0 } = Route.useSearch()
+	const { offset = 0, tags: selected_tags = [] } = Route.useSearch()
 	const [started, setStarted] = useState(false)
-	const [selectedTags, setSelectedTags] = useState<string[]>([])
 
-	const { data: games } = useSuspenseQuery(gamesQueryOptions({ offset: 0 }))
-	const { data: tagGroups } = useSuspenseQuery(tagsQueryOptions(selectedTags))
+	const { data: games } = useSuspenseQuery(
+		gamesQueryOptions({ offset: 0, tags: selected_tags }),
+	)
 
 	const handleLoadMore = () => setStarted(true)
 
 	return (
 		<main className="page-wrap px-4 pb-8 pt-14">
-			{/* game section */}
 			<section className="flex gap-4 justify-end flex-nowrap p-4 max-w-6xl mx-auto bg-linear-0 from-[rgba(44,48,55)] to-[rgba(80,95,110)]">
-				<div className="hidden lg:block shadow_item text-lg font-bold text-(--sea-ink-soft) px-2 w-1/3">
-					<h1 className="break-normal p-5">Filters</h1>
-
-					{Object.entries(tagGroups).map(([group, tags]) => (
-						<details key={group}>
-							<summary className="break-normal w-full">{group}</summary>
-							{tags.map(({ tag, game_count }) => (
-								<div
-									key={tag}
-									className="flex justify-between pt-2 text-nowrap
-									text-xs"
-								>
-									<span>{tag}</span>
-									<span>{game_count}</span>
-									{/* button */}
-								</div>
-							))}
-						</details>
-					))}
-				</div>
+				<Suspense fallback={<div>test filter fallback</div>}>
+					<GameFilters selected_tags={selected_tags} />
+				</Suspense>
 				<div className="basis-full">
 					<div className="flex flex-col gap-2">
 						{games.results.map((game) => (
@@ -68,7 +52,7 @@ function App() {
 						))}
 						{started && (
 							<Suspense>
-								<GameSelectionTail offset={offset} />
+								<GameSelectionTail offset={offset} tags={selected_tags} />
 							</Suspense>
 						)}
 					</div>

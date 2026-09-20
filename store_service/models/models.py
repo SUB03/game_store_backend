@@ -14,7 +14,7 @@ from sqlalchemy import (
 
 metadata_obj = MetaData()
 
-games = Table(
+games_table = Table(
     "store_games",
     metadata_obj,
     Column("appid", BigInteger, Identity(), primary_key=True),
@@ -44,60 +44,60 @@ games = Table(
     Column("negative", Integer),
 )
 
-developers = Table(
+developers_table = Table(
     "store_developers",
     metadata_obj,
     Column("appid", BigInteger, ForeignKey("store_games.appid"), primary_key=True),
     Column("developers", Text, primary_key=True)
 )
 
-publishers = Table(
+publishers_table = Table(
     "store_publishers",
     metadata_obj,
     Column("appid", BigInteger, ForeignKey("store_games.appid"), primary_key=True),
     Column("publishers", Text, primary_key=True)
 )
 
-game_text_languages = Table(
+game_text_languages_table = Table(
     "store_game_text_languages",
     metadata_obj,
     Column("appid", BigInteger, ForeignKey("store_games.appid"), primary_key=True),
     Column("language", Text, primary_key=True),
 )
 
-game_audio_languages = Table(
+game_audio_languages_table = Table(
     "store_game_audio_languages",
     metadata_obj,
     Column("appid", BigInteger, ForeignKey("store_games.appid"), primary_key=True),
     Column("language", Text, primary_key=True),
 )
 
-categories = Table(
+categories_table = Table(
     "store_categories",
     metadata_obj,
     Column("appid", BigInteger, ForeignKey("store_games.appid"), primary_key=True),
     Column("categories", Text, primary_key=True)
 )
-genres = Table(
+genres_table = Table(
     "store_genres",
     metadata_obj,
     Column("appid", BigInteger, ForeignKey("store_games.appid"), primary_key=True),
     Column("genres", Text, primary_key=True)
 )
-tags = Table(
+tags_table = Table(
     "store_tags",
     metadata_obj,
     Column("appid", BigInteger, ForeignKey("store_games.appid"), primary_key=True),
     Column("tags", Text, primary_key=True)
 )
-screenshots = Table(
+screenshots_table = Table(
     "store_screenshots",
     metadata_obj,
     Column("appid", BigInteger, ForeignKey("store_games.appid"), primary_key=True),
     Column("screenshots", Text, primary_key=True)
 )
 
-movies = Table(
+movies_table = Table(
     "store_movies",
     metadata_obj,
     Column("appid", BigInteger, ForeignKey("store_games.appid"), primary_key=True),

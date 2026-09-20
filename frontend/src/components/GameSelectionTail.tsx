@@ -5,13 +5,21 @@ import { useNavigate } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 import GameSelectionItemSmall from "./GameSelectionItemSmall"
 
-export default function GameSelectionTail({ offset }: { offset: number }) {
+interface GameSelectionTailProps {
+	offset: number
+	tags: string[]
+}
+
+export default function GameSelectionTail({
+	offset,
+	tags,
+}: GameSelectionTailProps) {
 	const navigate = useNavigate({ from: Route.fullPath })
 
 	const [startOffset] = useState(offset === 0 ? 12 : offset)
 
 	const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-		useSuspenseInfiniteQuery(gamesInfiniteQueryOptions(startOffset))
+		useSuspenseInfiniteQuery(gamesInfiniteQueryOptions(startOffset, { tags }))
 
 	useEffect(() => {
 		const currentBatchStart = startOffset + (data.pages.length - 1) * 12

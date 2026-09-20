@@ -5,7 +5,7 @@ from sqlalchemy import select, func
 
 from store_service.schemas.games import Price
 from store_service.engine import engine
-from store_service.models.models import games, tags
+from store_service.models.models import games_table, tags_table
 from store_service.routers.store_utils import get_price, has_game, make_payment, add_game
 from store_service.schemas.games import PurchaseGame
 from store_service.utils.jwt import decode_jwt
@@ -19,40 +19,42 @@ router = routing.APIRouter(
 
 @router.get("/tags")
 async def get_tags(
-    selected_tags: list[str] | None = Query(
-        None, description="Only count games that have ALL these tags"
+    tags: str | None = Query(
+        None, description="Comma-separated tags; only count games that have ALL of them"
     ),
 ):
+    tags = [t for t in (tags or "").split(",") if t] or None
+    
     async with engine.begin() as conn:
-        if not selected_tags:
+        if not tags:
             # No filter: count every tag across all games
             stmt = (
                 select(
-                    tags.c.tags.label("tag"),
-                    func.count(func.distinct(tags.c.appid)).label("game_count"),
+                    tags_table.c.tags.label("tag"),
+                    func.count(func.distinct(tags_table.c.appid)).label("game_count"),
                 )
-                .group_by(tags.c.tags)
-                .order_by(func.count(func.distinct(tags.c.appid)).desc())
+                .group_by(tags_table.c.tags)
+                .order_by(func.count(func.distinct(tags_table.c.appid)).desc())
             )
         else:
             # Find games that have ALL selected tags, then count tags within that subset
             matching_games = (
-                select(tags.c.appid)
-                .where(tags.c.tags.in_(selected_tags))
-                .group_by(tags.c.appid)
+                select(tags_table.c.appid)
+                .where(tags_table.c.tags.in_(tags))
+                .group_by(tags_table.c.appid)
                 .having(
-                    func.count(func.distinct(tags.c.tags)) >= len(selected_tags)
+                    func.count(func.distinct(tags_table.c.tags)) >= len(tags)
                 )
                 .subquery()
             )
             stmt = (
                 select(
-                    tags.c.tags.label("tag"),
-                    func.count(func.distinct(tags.c.appid)).label("game_count"),
+                    tags_table.c.tags.label("tag"),
+                    func.count(func.distinct(tags_table.c.appid)).label("game_count"),
                 )
-                .where(tags.c.appid.in_(select(matching_games.c.appid)))
-                .group_by(tags.c.tags)
-                .order_by(func.count(func.distinct(tags.c.appid)).desc())
+                .where(tags_table.c.appid.in_(select(matching_games.c.appid)))
+                .group_by(tags_table.c.tags)
+                .order_by(func.count(func.distinct(tags_table.c.appid)).desc())
             )
 
         result = await conn.execute(stmt)
@@ -83,7 +85,7 @@ async def get_tags(
 async def get_game(appid: Annotated[int, Path(title="appid of the game in db")]):
     async with engine.begin() as conn:
         result = await conn.execute(
-            games.select().where(games.c.appid == appid)
+            games_table.select().where(games_table.c.appid == appid)
         )
     return result.mappings().first()
 
@@ -91,28 +93,31 @@ async def get_game(appid: Annotated[int, Path(title="appid of the game in db")])
 async def get_games(
     offset: int = Query(0, ge=0),
     search: str | None = Query(None, description="Search by name"),
-    tags_filter: list[str] | None = Query(None, description="Filter by tags (AND)"),
+    tags: str | None = Query(
+        None, description="Comma-separated tags; filter by tags (AND)"
+    ),
 ):
+    tags = [t for t in (tags or "").split(",") if t] or None
     limit = 12
 
     stmt = (
-        select(games, func.array_agg(tags.c.tags).label("tags"))
-        .join(tags, tags.c.appid == games.c.appid, isouter=True)
-        .group_by(games.c.appid)
-        .order_by(games.c.recommendations.desc(),  games.c.appid)
+        select(games_table, func.array_agg(tags_table.c.tags).label("tags"))
+        .join(tags_table, tags_table.c.appid == games_table.c.appid, isouter=True)
+        .group_by(games_table.c.appid)
+        .order_by(games_table.c.recommendations.desc(),  games_table.c.appid)
         .limit(limit + 1)  # fetch one extra to detect next page
         .offset(offset * limit)
     )
 
     if search:
-        stmt = stmt.where(games.c.name.ilike(f"%{search}%"))
+        stmt = stmt.where(games_table.c.name.ilike(f"%{search}%"))
 
-    if tags_filter:
+    if tags:
         # Only include games that have ALL the requested tags
         stmt = stmt.having(
-            func.count(func.distinct(tags.c.tags)).filter(
-                tags.c.tags.in_(tags_filter)
-            ) >= len(tags_filter)
+            func.count(func.distinct(tags_table.c.tags)).filter(
+                tags_table.c.tags.in_(tags)
+            ) >= len(tags)
         )
     
     async with engine.begin() as conn:
