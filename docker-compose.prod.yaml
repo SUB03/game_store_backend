@@ -1,0 +1,83 @@
+services:
+    postgres:
+        restart: unless-stopped
+        networks:
+            - app-net
+    auth_service:
+        restart: unless-stopped
+        networks:
+            - app-net
+    store_service:
+        restart: unless-stopped
+        networks:
+            - app-net
+    payment_service:
+        restart: unless-stopped
+        networks:
+            - app-net
+    users_service:
+        restart: unless-stopped
+        networks:
+            - app-net
+    
+    victorialogs:
+        restart: unless-stopped
+        networks:
+            - app-net
+    
+    vmagent:
+        restart: unless-stopped
+        networks:
+            - app-net
+    
+    victoriametrics:
+        restart: unless-stopped
+        networks:
+            - app-net
+    
+    grafana:
+        restart: unless-stopped
+        networks:
+            - app-net
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+            target: runner
+        restart: unless-stopped
+        networks:
+            - app-net
+    caddy:
+        image: caddy:latest
+        container_name: caddy
+        restart: unless-stopped
+        volumes:
+            - ./Caddyfile:/etc/caddy/Caddyfile
+            - caddy_data:/data
+            - caddy_config:/config
+        networks:
+            - app-net
+    
+    cloudpub:
+        image: cloudpub/cloudpub:latest
+        container_name: cloudpub
+        restart: unless-stopped
+        environment:
+            - TOKEN=${CLOUDPUB_TOKEN}
+            - HTTP=caddy:80
+        command: run
+        depends_on:
+            - caddy
+        networks:
+            - app-net
+        volumes:
+            - cloudpub-config:/home/cloudpub
+
+networks:
+  app-net:
+    driver: bridge
+
+volumes:
+    cloudpub-config:
+    caddy_data:
+    caddy_config:

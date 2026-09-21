@@ -1,0 +1,33 @@
+:80 {
+    reverse_proxy /users/* auth_service:8000 {
+        flush_interval -1
+        transport http {
+            versions 1.1
+        }
+    }
+    reverse_proxy /store/* store_service:8001 {
+        flush_interval -1
+        transport http {
+            versions 1.1
+        }
+    }
+    reverse_proxy /payment/* payment_service:8002 {
+        flush_interval -1
+        transport http {
+            versions 1.1
+        }
+    }
+    reverse_proxy /auth/* auth_service:8000 {
+        flush_interval -1
+        transport http {
+            versions 1.1
+        }
+    }
+
+    reverse_proxy frontend:3001 {
+        flush_interval -1
+        transport http {
+            versions 1.1
+        }
+    }
+}

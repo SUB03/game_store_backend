@@ -2,8 +2,12 @@ import { createMiddleware } from "@tanstack/react-start"
 import { getCookie, setResponseHeader } from "@tanstack/react-start/server"
 import axios from "redaxios"
 
-export const AUTH_API = "http://localhost:8000"
-export const STORE_API = "http://localhost:8001"
+export const AUTH_API =
+	process.env.AUTH_SERVICE_URL ??
+	(import.meta.env.DEV ? "http://localhost:8000" : "")
+export const STORE_API =
+	process.env.STORE_SERVICE_URL ??
+	(import.meta.env.DEV ? "http://localhost:8000" : "")
 
 export const auth_api = axios.create({
 	baseURL: AUTH_API,
@@ -23,8 +27,8 @@ export const store_api = axios.create({
 
 export const authMiddleware = createMiddleware({ type: "function" }).server(
 	async ({ next }) => {
-		let access_token = getCookie("access_token")
-		let refresh_token = getCookie("refresh_token")
+		const access_token = getCookie("access_token")
+		const refresh_token = getCookie("refresh_token")
 
 		const proxyCookies = (backendResponse: Response) => {
 			const setCookieHeaders = backendResponse.headers.getSetCookie()
