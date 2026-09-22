@@ -53,3 +53,42 @@ export default function GameFilters({ selected_tags }: GameFiltersProps) {
 		</div>
 	)
 }
+
+export function GameFiltersSkeleton() {
+	return (
+		<div className="hidden lg:block shadow_item text-lg font-bold text-(--sea-ink-soft) px-2 w-1/3">
+			<h1 className="break-normal p-5">Filters</h1>
+
+			<div className="animate-pulse">
+				{Array.from({ length: 5 }, (_, g) => (
+					// biome-ignore lint/suspicious/noArrayIndexKey: never reorders, stable
+					<div key={g} className="mb-1">
+						{/* summary row */}
+						<div className="px-2 py-1">
+							<div
+								className="h-4 bg-(--inset-glint) rounded-xs"
+								style={{ width: `${40 + ((g * 13) % 40)}%` }}
+							/>
+						</div>
+
+						{/* tag rows under the first group only, so it reads as "expanded" */}
+						{g === 0 &&
+							Array.from({ length: 6 }, (_, r) => (
+								<div
+									// biome-ignore lint/suspicious/noArrayIndexKey: never reorders, stable
+									key={r}
+									className="flex justify-between gap-2 px-2 py-1 border-l-4 border-transparent"
+								>
+									<div
+										className="h-3 bg-(--inset-glint) rounded-xs"
+										style={{ width: `${50 + ((r * 17) % 40)}%` }}
+									/>
+									<div className="h-3 w-6 bg-(--inset-glint) rounded-xs" />
+								</div>
+							))}
+					</div>
+				))}
+			</div>
+		</div>
+	)
+}

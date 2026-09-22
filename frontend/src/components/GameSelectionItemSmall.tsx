@@ -99,3 +99,23 @@ export default function GameSelectionItem({ game }: { game: Game }) {
 		</div>
 	)
 }
+
+export function SkeletonItemSmall() {
+	return (
+		<div className="flex sm:flex-row flex-col glass-panel shadow_item animate-pulse">
+			{/* image */}
+			<div className="m-1 grow shrink basis-auto sm:basis-1/2 md:basis-1/4 aspect-video bg-(--inset-glint) rounded" />
+			{/* details */}
+			<div className="grid grow shrink basis-auto sm:basis-1/2 md:basis-3/4 pl-2 pr-1 py-1 gap-2">
+				<div className="h-5 w-3/4 bg-(--inset-glint) rounded" />
+				<div className="flex gap-1">
+					<div className="h-5 w-12 bg-(--inset-glint) rounded-xs" />
+					<div className="h-5 w-16 bg-(--inset-glint) rounded-xs" />
+					<div className="h-5 w-10 bg-(--inset-glint) rounded-xs" />
+				</div>
+				<div className="h-4 w-1/3 bg-(--inset-glint) rounded" />
+				<div className="h-4 w-1/4 bg-(--inset-glint) rounded ml-auto" />
+			</div>
+		</div>
+	)
+}

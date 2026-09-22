@@ -4,6 +4,7 @@ import { useSuspenseInfiniteQuery } from "@tanstack/react-query"
 import { useNavigate } from "@tanstack/react-router"
 import { useEffect, useState } from "react"
 import GameSelectionItemSmall from "./GameSelectionItemSmall"
+import { GameSelectionSkeleton } from "./GameSelectionHead"
 
 interface GameSelectionTailProps {
 	offset: number
@@ -40,6 +41,8 @@ export default function GameSelectionTail({
 				.map((game) => (
 					<GameSelectionItemSmall key={game.appid} game={game} />
 				))}
+
+			{isFetchingNextPage && <GameSelectionSkeleton />}
 
 			{hasNextPage && (
 				<div className="flex justify-center mt-4">

@@ -7,7 +7,7 @@ export const AUTH_API =
 	(import.meta.env.DEV ? "http://localhost:8000" : "")
 export const STORE_API =
 	process.env.STORE_SERVICE_URL ??
-	(import.meta.env.DEV ? "http://localhost:8000" : "")
+	(import.meta.env.DEV ? "http://localhost:8001" : "")
 
 export const auth_api = axios.create({
 	baseURL: AUTH_API,

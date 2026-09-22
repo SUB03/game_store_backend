@@ -1,6 +1,8 @@
 import { gamesQueryOptions } from "#/queries/games"
 import { useSuspenseQuery } from "@tanstack/react-query"
-import GameSelectionItemSmall from "./GameSelectionItemSmall"
+import GameSelectionItemSmall, {
+	SkeletonItemSmall,
+} from "./GameSelectionItemSmall"
 
 interface GameSelectionHeadProps {
 	tags: string[]
@@ -34,5 +36,16 @@ export default function GameSelectionHead({
 				</div>
 			)}
 		</>
+	)
+}
+
+export function GameSelectionSkeleton({ count = 12 }: { count?: number }) {
+	return (
+		<div className="flex flex-col gap-2" aria-busy="true">
+			{Array.from({ length: count }, (_, i) => (
+				// biome-ignore lint/suspicious/noArrayIndexKey: static skeleton list, never reorders
+				<SkeletonItemSmall key={i} />
+			))}
+		</div>
 	)
 }
