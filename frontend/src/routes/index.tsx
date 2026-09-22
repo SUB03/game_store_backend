@@ -31,33 +31,35 @@ function App() {
 
 	console.log(started)
 	return (
-		<main className="page-wrap px-4 pb-8">
+		<>
 			<Search />
-			<section className="flex gap-4 justify-end flex-nowrap p-4 max-w-6xl mx-auto bg-linear-0 from-[rgba(44,48,55)] to-[rgba(80,95,110)]">
-				<Suspense fallback={<GameFiltersSkeleton />}>
-					<GameFilters selected_tags={selected_tags} />
-				</Suspense>
-				<div className="basis-full">
-					<div className="flex flex-col gap-2">
-						<Suspense fallback={<GameSelectionSkeleton />}>
-							<GameSelectionHead
-								tags={selected_tags}
-								started={started}
-								handleLoadMore={handleLoadMore}
-							/>
-						</Suspense>
-						{started && (
+			<main className="page-wrap px-4 pb-8">
+				<section className="flex gap-4 justify-end flex-nowrap p-4 max-w-6xl mx-auto bg-linear-0 from-(--game-section-bg) to-(--game-section-bg-light)">
+					<Suspense fallback={<GameFiltersSkeleton />}>
+						<GameFilters selected_tags={selected_tags} />
+					</Suspense>
+					<div className="basis-full">
+						<div className="flex flex-col gap-2">
 							<Suspense fallback={<GameSelectionSkeleton />}>
-								<GameSelectionTail
-									key={selected_tags.join(",")}
-									offset={offset}
+								<GameSelectionHead
 									tags={selected_tags}
+									started={started}
+									handleLoadMore={handleLoadMore}
 								/>
 							</Suspense>
-						)}
+							{started && (
+								<Suspense fallback={<GameSelectionSkeleton />}>
+									<GameSelectionTail
+										key={selected_tags.join(",")}
+										offset={offset}
+										tags={selected_tags}
+									/>
+								</Suspense>
+							)}
+						</div>
 					</div>
-				</div>
-			</section>
-		</main>
+				</section>
+			</main>
+		</>
 	)
 }

@@ -7,7 +7,7 @@ export default function Header() {
 	const user = Route.useRouteContext().user
 
 	return (
-		<header className="sticky top-0 z-50 border-b border-(--line) bg-(--header-bg) px-4 backdrop-blur-lg">
+		<header className="bg-(--header-bg) px-4 backdrop-blur-lg">
 			<nav className="page-wrap max-w-6xl mx-auto flex flex-wrap items-center gap-x-3 gap-y-2 py-3 sm:py-5">
 				<div className="m-0 shrink-0 text-base font-semibold tracking-tight flex gap-10">
 					<a href="/">
