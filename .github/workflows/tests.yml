@@ -1,0 +1,32 @@
+name: Tests
+
+on:
+  # run the suite on every commit pushed to any branch
+  push:
+  # and allow manual runs from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest # ships with a Docker daemon for the integration fixtures
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14" # matches the local .venv
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Unit tests
+        run: pytest tests/unit -q
+
+      # starts a throwaway postgres:18 container on 127.0.0.1:5433,
+      # applies all three services' alembic migrations, then removes it
+      - name: Integration tests
+        run: pytest tests/integration -q
