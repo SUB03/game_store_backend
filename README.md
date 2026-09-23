@@ -119,11 +119,26 @@ Alembic migrations run as subprocesses and are intentionally not measured.
    dependencies, runs the unit suite, then the integration suite (test data is
    appended so a single `coverage.xml` covers both suites).
 2. **deploy** job (`needs: tests`, self-hosted label `laptop`): starts **only
-   after the tests are green** and runs:
+   after the tests are green** and then:
+
+   - recreates `.env` from the `DEPLOY_ENV` repository secret (the file is
+     gitignored and `actions/checkout` removes untracked files every run),
+   - starts PostgreSQL and waits until it accepts connections,
+   - runs `alembic upgrade head` for `auth_service`, `store_service` and
+     `users_service` in one-off containers,
+   - deploys the stack:
 
    ```bash
    docker compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d --build
    ```
+
+   **Required secret:** add `DEPLOY_ENV` under *Settings -> Secrets and
+   variables -> Actions* with the full contents of your `.env` file.
+
+   **One-time note:** stop any manually started stack first
+   (`docker compose ... down`) — Compose `container_name`s and host ports
+   collide otherwise. The CI checkout also gets its own project name, so a
+   fresh `pgdata` volume is possible; the migration step creates the schema.
 
 ### Registering the laptop as a self-hosted runner
 
