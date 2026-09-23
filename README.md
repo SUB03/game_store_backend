@@ -64,7 +64,7 @@ pip install -e ./protobufs
 
 ## Tests
 
-Install the dev dependencies (pytest + pytest-asyncio) into your virtualenv:
+Install the dev dependencies (pytest + pytest-asyncio + pytest-cov) into your virtualenv:
 
 ```bash
 pip install -r requirements-dev.txt
@@ -95,3 +95,52 @@ pytest
   The tables used by the tests (`auth_users`, `auth_token_whitelist`,
   `store_games`, `store_tags`, `users_game_ownership`) are truncated around
   every test.
+
+## Coverage
+
+`pytest-cov` is part of `requirements-dev.txt`, and `pytest.ini` always passes
+the `--cov-*` flags, so every `pytest` run prints a per-file coverage table and
+writes `coverage.xml` plus an HTML report into `htmlcov/`:
+
+```bash
+pytest
+xdg-open htmlcov/index.html   # or: python -m http.server -d htmlcov 8000
+```
+
+Coverage is report-only — there is no threshold that can fail the run.
+Alembic migrations run as subprocesses and are intentionally not measured.
+
+## CI/CD
+
+`.github/workflows/tests.yml` runs on every push to `master` (or manually via
+*Actions -> Tests -> Run workflow*):
+
+1. **tests** job (GitHub-hosted `ubuntu-latest`, Docker available): installs
+   dependencies, runs the unit suite, then the integration suite (test data is
+   appended so a single `coverage.xml` covers both suites).
+2. **deploy** job (`needs: tests`, self-hosted label `laptop`): starts **only
+   after the tests are green** and runs:
+
+   ```bash
+   docker compose -f docker-compose.yaml -f docker-compose.prod.yaml up -d --build
+   ```
+
+### Registering the laptop as a self-hosted runner
+
+1. On GitHub: *Settings -> Actions -> Runners -> New self-hosted runner*,
+   pick Linux, and follow the download steps.
+2. Configure it with the `laptop` label — the deploy job targets this label:
+
+   ```bash
+   ./config.sh --url https://github.com/SUB03/something_with_postgres --token <TOKEN> --labels laptop --name laptop
+   ```
+
+3. Install and start it as a service so it survives reboots:
+
+   ```bash
+   sudo ./svc.sh install
+   sudo ./svc.sh start
+   ```
+
+4. Keep Docker running on the laptop — the deploy step uses it; checkout and
+   compose files live in the runner `_work` directory.
