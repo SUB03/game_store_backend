@@ -42,6 +42,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # datasets/ is gitignored too, so restore it from the runner's
+      # persistent copy — the first store migration loads it into the db
+      - name: Restore dataset
+        run: cp -rT ~/datasets/game_store_dataset ./datasets
+
       # .env is gitignored and checkout wipes untracked files every run,
       # so recreate it from the DEPLOY_ENV repository secret
       - name: Create .env

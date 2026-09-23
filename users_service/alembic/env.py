@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-import models
+from users_service.models import models
 from alembic import context
 
 class Settings(BaseSettings):
