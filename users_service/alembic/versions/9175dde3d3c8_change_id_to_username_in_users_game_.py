@@ -25,6 +25,13 @@ def upgrade() -> None:
     op.drop_constraint(op.f('users_game_ownership_id_fkey'), 'users_game_ownership', type_='foreignkey')
     op.create_foreign_key(None, 'users_game_ownership', 'auth_users', ['username'], ['username'])
     op.drop_column('users_game_ownership', 'id')
+    # dropping the id column dropped the old (id, appid) primary key with it;
+    # recreate it on the columns that remain, matching models.py
+    op.create_primary_key(
+        op.f('users_game_ownership_pkey'),
+        'users_game_ownership',
+        ['username', 'appid'],
+    )
     # ### end Alembic commands ###
 
 

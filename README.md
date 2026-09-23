@@ -61,3 +61,37 @@ For local development, you may also want to install the protobuf packages:
 cd shared
 pip install -e ./protobufs
 ```
+
+## Tests
+
+Install the dev dependencies (pytest + pytest-asyncio) into your virtualenv:
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+Run everything:
+
+```bash
+pytest
+```
+
+- **Unit tests** (`tests/unit`) need no database and no Docker:
+
+  ```bash
+  pytest tests/unit
+  ```
+
+- **Integration tests** (`tests/integration`) start a throwaway
+  `postgres:18` container on `127.0.0.1:5433`, apply all three services'
+  Alembic migrations to it, run the tests and remove the container again.
+  Requires a working Docker daemon. To use an existing database instead,
+  point the suite at it:
+
+  ```bash
+  TEST_SQLALCHEMY_URL=postgresql+psycopg://user:pass@host:5432/dbname pytest tests/integration
+  ```
+
+  The tables used by the tests (`auth_users`, `auth_token_whitelist`,
+  `store_games`, `store_tags`, `users_game_ownership`) are truncated around
+  every test.
