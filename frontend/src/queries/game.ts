@@ -12,7 +12,7 @@ export const fetchGame = createServerFn({ method: "GET" })
 	.validator(gameParamsSchema)
 	.handler(async ({ data }) => {
 		try {
-			const response = await store_api.get<Game>(
+			const response = await store_api.get<Game | null>(
 				`store/games/${data.appid}`,
 				{},
 			)

@@ -87,3 +87,28 @@ async def test_make_payment_uses_configured_shop_credentials(servicer, context):
     # Settings() reads SHOPID / UKASS_API_KEY from the environment
     assert servicer.settings.shopid
     assert servicer.settings.ukass_api_key
+
+
+async def test_make_payment_attaches_metadata_for_webhook(
+    servicer, context, fake_yookassa
+):
+    await servicer.MakePayment(
+        MakePaymentRequest(username="alice", appid=42, price="9.99"), context
+    )
+    request = fake_yookassa.created_requests[0]
+    # The store_service webhook reads these to grant ownership.
+    assert request.metadata == {"username": "alice", "appid": "42"}
+    assert "42" in request.description
+
+
+async def test_make_payment_return_url_points_at_profile(
+    servicer, context, fake_yookassa
+):
+    await servicer.MakePayment(
+        MakePaymentRequest(username="alice", appid=42, price="9.99"), context
+    )
+    request = fake_yookassa.created_requests[0]
+    assert (
+        request.confirmation.return_url
+        == f"{servicer.settings.frontend_url}/profile"
+    )

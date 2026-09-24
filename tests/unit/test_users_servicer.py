@@ -1,11 +1,13 @@
 """Unit tests for the users_service gRPC servicer (engine is mocked)."""
 
+from types import SimpleNamespace
 from unittest.mock import MagicMock
 
 import pytest
 from users_proto.users_service_pb2 import (
     AddGameToUserRequest,
     AddGameToUserResponse,
+    GetOwnedGamesRequest,
     HasGameRequest,
     HasGameResponse,
 )
@@ -14,11 +16,15 @@ from users_service.main import Settings, UsersServiceServicer
 
 
 class FakeResult:
-    def __init__(self, row=None):
+    def __init__(self, row=None, rows=None):
         self._row = row
+        self._rows = rows if rows is not None else ([] if row is None else [row])
 
     def fetchone(self):
         return self._row
+
+    def fetchall(self):
+        return self._rows
 
 
 class FakeConnection:
@@ -96,3 +102,31 @@ async def test_has_game_returns_false_when_row_missing(context):
     )
 
     assert response.result is False
+
+
+async def test_get_owned_games_returns_appids(context):
+    rows = [
+        SimpleNamespace(username="alice", appid=1),
+        SimpleNamespace(username="alice", appid=42),
+    ]
+    connection = FakeConnection(FakeResult(rows=rows))
+    servicer = _servicer(connection)
+
+    response = await servicer.GetOwnedGames(
+        GetOwnedGamesRequest(username="alice"), context
+    )
+
+    assert list(response.appids) == [1, 42]
+    assert "SELECT" in connection.statements[0]
+    assert "users_game_ownership" in connection.statements[0]
+
+
+async def test_get_owned_games_with_empty_library(context):
+    connection = FakeConnection(FakeResult(rows=[]))
+    servicer = _servicer(connection)
+
+    response = await servicer.GetOwnedGames(
+        GetOwnedGamesRequest(username="bob"), context
+    )
+
+    assert list(response.appids) == []

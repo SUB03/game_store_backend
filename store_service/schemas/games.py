@@ -1,9 +1,6 @@
 from pydantic import BaseModel
 
-class RequiresAuth(BaseModel):
-    csrf: str
-
-class PurchaseGame(RequiresAuth):
+class PurchaseGame(BaseModel):
     appid: int
 
 class Price(BaseModel):

@@ -18,7 +18,6 @@ export function useLogin() {
 			const { data } = await auth_api.post<AuthResponse>("/users/login", body, {
 				headers: { "Content-Type": "application/x-www-form-urlencoded" },
 			})
-			localStorage.setItem("CSRF", data.CSRF)
 			return data
 		},
 	})
@@ -31,7 +30,6 @@ export function useRegister() {
 				"/users/registrate",
 				input,
 			)
-			localStorage.setItem("CSRF", data.CSRF)
 			return data
 		},
 	})
@@ -41,7 +39,6 @@ export function useLogout() {
 	return useMutation({
 		mutationFn: async () => {
 			await auth_api.post("/users/logout")
-			localStorage.removeItem("CSRF")
 		},
 	})
 }

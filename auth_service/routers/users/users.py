@@ -63,7 +63,7 @@ async def login(response: Response, form_data: Annotated[OAuth2PasswordRequestFo
     access_token, refresh_token, refresh_expire = create_tokens(user.username, str(jti))
     await store_token_in_db(jti, refresh_expire)
 
-    _set_cookies(response, access_token, refresh_token, False if DEVELOPMENT else True,
+    _set_cookies(response, access_token, refresh_token, str(jti), False if DEVELOPMENT else True,
         ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES)
 
     return {"message": "authorized", "CSRF": str(jti)}
@@ -76,6 +76,7 @@ async def logout(response: Response, refresh_token: Annotated[str | None, Cookie
         await delete_token_from_db(payload.jti)
     response.delete_cookie("access_token")
     response.delete_cookie("refresh_token")
+    response.delete_cookie("CSRF")
     
     return {"message": "logged out"}
 
@@ -98,7 +99,7 @@ async def refresh(
     access_token, refresh_token, refresh_expire = create_tokens(payload.sub, str(jti))
     await store_token_in_db(jti, refresh_expire)
 
-    _set_cookies(response, access_token, refresh_token, False if DEVELOPMENT else True,
+    _set_cookies(response, access_token, refresh_token, str(jti), False if DEVELOPMENT else True,
         ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES)
 
     return {"message": "authorized", "CSRF": str(jti)}
@@ -116,7 +117,7 @@ async def registrate(response: Response, user_data: CreateUser):
     access_token, refresh_token, refresh_expire = create_tokens(user_data.username, str(jti))
     await store_token_in_db(jti, refresh_expire)
 
-    _set_cookies(response, access_token, refresh_token, False if DEVELOPMENT else True,
+    _set_cookies(response, access_token, refresh_token, str(jti), False if DEVELOPMENT else True,
         ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_MINUTES)
 
     return {"message": "authorized", "CSRF": str(jti)}

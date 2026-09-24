@@ -8,7 +8,7 @@ from pydantic import ValidationError
 
 from auth_service.schemas.token import Token
 from auth_service.schemas.users import CreateUser, UserBase, UserDB
-from store_service.schemas.games import Price, PurchaseGame, RequiresAuth
+from store_service.schemas.games import Price, PurchaseGame
 
 
 # --- auth schemas -----------------------------------------------------------
@@ -59,19 +59,12 @@ def test_token_rejects_invalid_jti():
 
 # --- store schemas ----------------------------------------------------------
 
-def test_requires_auth_requires_csrf():
-    assert RequiresAuth(csrf="abc").csrf == "abc"
-    with pytest.raises(ValidationError):
-        RequiresAuth()
-
-
-def test_purchase_game_requires_csrf_and_appid():
-    purchase = PurchaseGame(csrf="abc", appid=42)
+def test_purchase_game_requires_appid():
+    # csrf moved to the CSRF request header, so only appid stays in the body
+    purchase = PurchaseGame(appid=42)
     assert purchase.appid == 42
     with pytest.raises(ValidationError):
-        PurchaseGame(csrf="abc")
-    with pytest.raises(ValidationError):
-        PurchaseGame(appid=42)
+        PurchaseGame()
 
 
 def test_price_accepts_extra_fields_from_db_row():

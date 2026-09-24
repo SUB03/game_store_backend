@@ -34,9 +34,11 @@ def _access_token(jti: str, username: str = "alice") -> str:
     )
 
 
-async def _purchase(csrf: str, appid: int, access_token):
-    purchase = PurchaseGame(csrf=csrf, appid=appid)
-    return await store_router.purchase_game(purchase, access_token=access_token)
+async def _purchase(csrf: str | None, appid: int, access_token):
+    purchase = PurchaseGame(appid=appid)
+    return await store_router.purchase_game(
+        purchase, csrf=csrf, access_token=access_token
+    )
 
 
 @pytest.fixture
@@ -86,6 +88,14 @@ async def test_purchase_rejects_expired_token(mocks):
     with pytest.raises(HTTPException) as exc_info:
         await _purchase("whatever", 42, expired)
     assert exc_info.value.status_code == 401
+
+
+async def test_purchase_rejects_missing_csrf_header(mocks):
+    token = _access_token(str(uuid.uuid4()))
+    with pytest.raises(HTTPException) as exc_info:
+        await _purchase(None, 42, token)
+    assert exc_info.value.status_code == 401
+    mocks["has_game"].assert_not_awaited()
 
 
 async def test_purchase_rejects_csrf_mismatch(mocks):

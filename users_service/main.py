@@ -10,6 +10,8 @@ import users_proto.users_service_pb2_grpc as users_service_pb2_grpc
 from users_proto.users_service_pb2 import (
     AddGameToUserRequest,
     AddGameToUserResponse,
+    GetOwnedGamesRequest,
+    GetOwnedGamesResponse,
     HasGameRequest,
     HasGameResponse,
 )
@@ -48,7 +50,23 @@ class UsersServiceServicer(users_service_pb2_grpc.UserServiceServicer):
 
             return HasGameResponse(
                 result = True if result else False
-            ) 
+            )
+
+    async def GetOwnedGames(
+        self,
+        request: GetOwnedGamesRequest,
+        context: ServicerContext
+    ) -> GetOwnedGamesResponse:
+        async with self.engine.begin() as conn:
+            result = await conn.execute(
+                games_ownership.select().where(
+                    games_ownership.c.username == request.username
+                )
+            )
+            rows = result.fetchall()
+
+        return GetOwnedGamesResponse(appids=[row.appid for row in rows])
+
 
 async def serve():
     settings = Settings()

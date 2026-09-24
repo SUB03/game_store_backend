@@ -44,6 +44,11 @@ class UserServiceStub:
                 request_serializer=users__proto_dot_users__service__pb2.AddGameToUserRequest.SerializeToString,
                 response_deserializer=users__proto_dot_users__service__pb2.AddGameToUserResponse.FromString,
                 _registered_method=True)
+        self.GetOwnedGames = channel.unary_unary(
+                '/users.v1.UserService/GetOwnedGames',
+                request_serializer=users__proto_dot_users__service__pb2.GetOwnedGamesRequest.SerializeToString,
+                response_deserializer=users__proto_dot_users__service__pb2.GetOwnedGamesResponse.FromString,
+                _registered_method=True)
 
 
 class UserServiceServicer:
@@ -61,6 +66,12 @@ class UserServiceServicer:
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetOwnedGames(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_UserServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -73,6 +84,11 @@ def add_UserServiceServicer_to_server(servicer, server):
                     servicer.AddGameToUser,
                     request_deserializer=users__proto_dot_users__service__pb2.AddGameToUserRequest.FromString,
                     response_serializer=users__proto_dot_users__service__pb2.AddGameToUserResponse.SerializeToString,
+            ),
+            'GetOwnedGames': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetOwnedGames,
+                    request_deserializer=users__proto_dot_users__service__pb2.GetOwnedGamesRequest.FromString,
+                    response_serializer=users__proto_dot_users__service__pb2.GetOwnedGamesResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -129,6 +145,33 @@ class UserService:
             '/users.v1.UserService/AddGameToUser',
             users__proto_dot_users__service__pb2.AddGameToUserRequest.SerializeToString,
             users__proto_dot_users__service__pb2.AddGameToUserResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetOwnedGames(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/users.v1.UserService/GetOwnedGames',
+            users__proto_dot_users__service__pb2.GetOwnedGamesRequest.SerializeToString,
+            users__proto_dot_users__service__pb2.GetOwnedGamesResponse.FromString,
             options,
             channel_credentials,
             insecure,

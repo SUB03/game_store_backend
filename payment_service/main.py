@@ -11,6 +11,7 @@ from async_yookassa.models.payment import PaymentRequest, Amount, RedirectConfir
 class Settings(BaseSettings):
     shopid: str
     ukass_api_key: str = Field(alias="UKASS_API_KEY")
+    frontend_url: str = Field(alias="FRONTEND_URL")
     model_config = SettingsConfigDict(extra="ignore", env_file=".env")
 
 class PaymentServiceServicer(payment_service_pb2_grpc.PaymentServiceServicer):
@@ -29,11 +30,16 @@ class PaymentServiceServicer(payment_service_pb2_grpc.PaymentServiceServicer):
         ) as client:
             yookassa_request = PaymentRequest(
                 amount=Amount(value=request.price, currency="RUB"),
+                description=f"Purchase of app {request.appid} by {request.username}",
+                metadata={
+                    "username": request.username,
+                    "appid": str(request.appid),
+                },
                 confirmation=RedirectConfirmationRequest(
                     type="redirect",
-                    return_url=""
+                    return_url=f"{self.settings.frontend_url}/app/{request.appid}"
                 )
-            ) 
+            )
 
             payment = await client.payment.create(yookassa_request)
             

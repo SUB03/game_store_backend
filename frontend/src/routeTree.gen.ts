@@ -14,7 +14,8 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as RegisterRouteImport } from './routes/register'
-import { Route as AppAppidTitleRouteImport } from './routes/app.$appid.$title'
+import { Route as AppAppidIndexRouteImport } from './routes/app/$appid/index'
+import { Route as AppAppidTitleRouteImport } from './routes/app/$appid/$title'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -41,6 +42,11 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppAppidIndexRoute = AppAppidIndexRouteImport.update({
+  id: '/app/$appid/',
+  path: '/app/$appid/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppAppidTitleRoute = AppAppidTitleRouteImport.update({
   id: '/app/$appid/$title',
   path: '/app/$appid/$title',
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/app/$appid/$title': typeof AppAppidTitleRoute
+  '/app/$appid/': typeof AppAppidIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/app/$appid/$title': typeof AppAppidTitleRoute
+  '/app/$appid': typeof AppAppidIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,14 +79,27 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/register': typeof RegisterRoute
   '/app/$appid/$title': typeof AppAppidTitleRoute
+  '/app/$appid/': typeof AppAppidIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/about' | '/login' | '/profile' | '/register' | '/app/$appid/$title'
+    | '/'
+    | '/about'
+    | '/login'
+    | '/profile'
+    | '/register'
+    | '/app/$appid/$title'
+    | '/app/$appid/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/about' | '/login' | '/profile' | '/register' | '/app/$appid/$title'
+    | '/'
+    | '/about'
+    | '/login'
+    | '/profile'
+    | '/register'
+    | '/app/$appid/$title'
+    | '/app/$appid'
   id:
     | '__root__'
     | '/'
@@ -87,6 +108,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/register'
     | '/app/$appid/$title'
+    | '/app/$appid/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -96,6 +118,7 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RegisterRoute: typeof RegisterRoute
   AppAppidTitleRoute: typeof AppAppidTitleRoute
+  AppAppidIndexRoute: typeof AppAppidIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -135,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/$appid/': {
+      id: '/app/$appid/'
+      path: '/app/$appid'
+      fullPath: '/app/$appid/'
+      preLoaderRoute: typeof AppAppidIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/$appid/$title': {
       id: '/app/$appid/$title'
       path: '/app/$appid/$title'
@@ -152,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RegisterRoute: RegisterRoute,
   AppAppidTitleRoute: AppAppidTitleRoute,
+  AppAppidIndexRoute: AppAppidIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

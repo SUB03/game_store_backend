@@ -34,6 +34,8 @@ async def test_register_sets_cookies_and_returns_csrf(client):
     assert body["CSRF"]
     assert client.cookies.get("access_token")
     assert client.cookies.get("refresh_token")
+    # CSRF cookie mirrors the body value and is JS-readable for the header
+    assert client.cookies.get("CSRF") == body["CSRF"]
 
 
 async def test_register_duplicate_username_returns_409(client):
@@ -60,6 +62,7 @@ async def test_login_with_correct_password(client):
     assert response.status_code == 200
     assert client.cookies.get("access_token")
     assert client.cookies.get("refresh_token")
+    assert client.cookies.get("CSRF") == response.json()["CSRF"]
 
 
 async def test_login_with_wrong_password_returns_400(client):
@@ -130,6 +133,8 @@ async def test_refresh_rotates_tokens_and_revokes_old_jti(client, auth_app):
     new_refresh = client.cookies.get("refresh_token")
     assert new_access != old_access
     assert new_refresh != old_refresh
+    # the CSRF cookie rotates together with the access token
+    assert client.cookies.get("CSRF") == new_csrf
 
     # new session still works
     me = await client.get("/users/me")
@@ -161,6 +166,7 @@ async def test_logout_clears_cookies_and_revokes_access(client, auth_app):
     assert response.status_code == 200
     assert client.cookies.get("access_token") is None
     assert client.cookies.get("refresh_token") is None
+    assert client.cookies.get("CSRF") is None
 
     async with AsyncClient(
         transport=ASGITransport(app=auth_app),
