@@ -33,6 +33,7 @@ os.environ["SQLALCHEMY_URL"] = TEST_DB_URL
 os.environ.setdefault("SECRET_KEY", "test-secret-key")
 os.environ.setdefault("JWT_ALGORITHM", "HS256")
 os.environ.setdefault("DEVELOPMENT", "true")
+os.environ.setdefault("FRONTEND_URL", "http://localhost:3001")
 # payment_service settings (only used when constructing its Settings)
 os.environ.setdefault("SHOPID", "1")
 os.environ.setdefault("UKASS_API_KEY", "test-api-key")

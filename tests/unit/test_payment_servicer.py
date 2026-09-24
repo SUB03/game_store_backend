@@ -110,5 +110,5 @@ async def test_make_payment_return_url_points_at_profile(
     request = fake_yookassa.created_requests[0]
     assert (
         request.confirmation.return_url
-        == f"{servicer.settings.frontend_url}/profile"
+        == f"{servicer.settings.frontend_url}/app/42"
     )
